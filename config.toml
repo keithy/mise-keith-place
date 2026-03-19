@@ -8,3 +8,4 @@ includes = [
 
 [env]
 DEV_DATA_DIR = ".mise"
+DEV_NOTES_DIR = ".mise/notes"
