@@ -6,6 +6,10 @@ includes = [
     "./mise/tasks-shell",
 ]
 
+[tools]
+go = "latest"
+golangci-lint = "latest"
+
 [env]
 DEV_DATA_DIR = ".mise"
 DEV_NOTES_DIR = ".mise/notes"
