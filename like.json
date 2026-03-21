@@ -1,0 +1,12 @@
+[
+  {
+    "id": "1030",
+    "description": "fix: enable env var overrides for provider API keys and model_list entries (#836)",
+    "status": "open"
+  },
+  {
+    "id": "1038",
+    "description": "feat(skills): add IndexRegistry",
+    "status": "open"
+  }
+]

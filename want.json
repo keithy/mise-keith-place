@@ -1,0 +1,7 @@
+[
+  {
+    "id": "1261",
+    "title": "feat(security): add environment sanitization for exec tool",
+    "status": "open"
+  }
+]
