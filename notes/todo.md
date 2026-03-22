@@ -22,3 +22,7 @@
 - [x] Add tests: config env_set overrides inherited env
 - [x] Add tests: env_allowlist extends default list
 - [ ] Add tests: Windows case-insensitive behavior - Skipped (needs Windows CI - envKey needs refactoring to mock GOOS)
+
+## Technical Debt
+
+- [ ] Fix write tool to respect system umask 0002 (setgid) - creates files as 644 instead of 664

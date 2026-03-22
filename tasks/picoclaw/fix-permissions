@@ -1,5 +1,12 @@
 #!/bin/bash
 #MISE description="Fix ownership and permissions for picoclaw repo"
+#
+# IMPORTANT: This system uses:
+#   - umask 0002 (group write enabled by default)
+#   - setgid (g+s) on directories (new files inherit group "coder")
+#
+# All permissions should include group write (775/664) to support collaborative work.
+#
 set -euo pipefail
 
 REPO_DIR="${MISE_PROJECT_ROOT:-$(pwd)}"
@@ -12,10 +19,13 @@ sudo chown -R "${CURRENT_USER}:${CURRENT_GROUP}" "$REPO_DIR"
 echo "Setting permissions..."
 # Directories: 775
 sudo find "$REPO_DIR" -type d -exec chmod 775 {} \;
-# Files: 664
-sudo find "$REPO_DIR" -type f -exec chmod 664 {} \;
+# Files: 664 (skip build-* directories - binaries there should stay executable)
+sudo find "$REPO_DIR" -path '*/build-*' -prune -o -type f -exec chmod 664 {} \;
 # Executables: any .sh file or any file in *task* directories
 sudo find "$REPO_DIR" -type f -name '*.sh' -exec chmod 775 {} \;
 sudo find "$REPO_DIR" -type f -path '*/tasks*/*' -exec chmod 775 {} \;
+
+# Go build doesn't set +x, so explicitly set it for all files in build* directories
+sudo find "$REPO_DIR"/build* -type f -exec chmod 775 {} \; 2>/dev/null || true
 
 echo "Done!"
