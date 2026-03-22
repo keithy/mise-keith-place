@@ -2,6 +2,22 @@
 #MISE description="Build picoclaw binary (./build-next/picoclaw)"
 set -e
 
-# Delegate to build-current with different output dir
-script_dir="$(cd "$(dirname "$0")" && pwd)"
-exec "$script_dir/build-current" build-next
+OUTPUT_DIR="${1:-${BUILD_DIR:-build-next}}"
+
+TARGETS="${TARGETS:-./cmd/picoclaw}"
+
+echo "Building to $OUTPUT_DIR/..."
+IFS=',' read -ra TARGET_ARRAY <<< "$TARGETS"
+for target in "${TARGET_ARRAY[@]}"; do
+    base=$(basename "$target" .go)
+    echo "  Building $base..."
+    go build -ldflags "-s -w" -o "${OUTPUT_DIR}/${base}" "$target"
+done
+
+echo "Built to ${OUTPUT_DIR}/"
+
+chmod +x "${OUTPUT_DIR}"/*
+
+if command -v mise &>/dev/null; then
+    mise link github:sipeed/picoclaw@"${OUTPUT_DIR#*-}" "$OUTPUT_DIR" --force
+fi

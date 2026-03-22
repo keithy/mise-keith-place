@@ -2,17 +2,20 @@
 #MISE description="Fix ownership and permissions for picoclaw repo"
 set -euo pipefail
 
-REPO_DIR="/code/picoclaw"
+REPO_DIR="${MISE_PROJECT_ROOT:-$(pwd)}"
+CURRENT_USER=$(whoami)
+CURRENT_GROUP=$(id -gn)
 
-echo "Fixing ownership to infra:coder..."
-sudo chown -R infra:coder "$REPO_DIR"
+echo "Fixing ownership to ${CURRENT_USER}:${CURRENT_GROUP}..."
+sudo chown -R "${CURRENT_USER}:${CURRENT_GROUP}" "$REPO_DIR"
 
 echo "Setting permissions..."
-# Directories: 755
-sudo find "$REPO_DIR" -type d -exec chmod 755 {} \;
-# Files: 644, Executables: 755
-sudo find "$REPO_DIR" -type f -exec chmod 644 {} \;
-sudo find "$REPO_DIR" -type f -name '*.sh' -exec chmod 755 {} \;
-sudo find "$REPO_DIR" -type f -path '*/.mise/tasks/*' -exec chmod 755 {} \;
+# Directories: 775
+sudo find "$REPO_DIR" -type d -exec chmod 775 {} \;
+# Files: 664
+sudo find "$REPO_DIR" -type f -exec chmod 664 {} \;
+# Executables: any .sh file or any file in *task* directories
+sudo find "$REPO_DIR" -type f -name '*.sh' -exec chmod 775 {} \;
+sudo find "$REPO_DIR" -type f -path '*/tasks*/*' -exec chmod 775 {} \;
 
 echo "Done!"
