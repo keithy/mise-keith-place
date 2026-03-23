@@ -1,0 +1,33 @@
+#!/bin/bash
+#MISE description="Rollback to previous version"
+set -euo pipefail
+
+if [ ! -d "build-prev" ]; then
+    echo "[ROLLBACK] No previous build found."
+    exit 1
+fi
+
+echo "[ROLLBACK] Stopping picoclaw service..."
+if command -v picoclaw &>/dev/null; then
+    picoclaw service stop 2>/dev/null || true
+elif command -v picoclaw-manager &>/dev/null; then
+    picoclaw-manager service stop 2>/dev/null || true
+elif systemctl --user is-active picoclaw &>/dev/null; then
+    systemctl --user stop picoclaw
+fi
+
+echo "[ROLLBACK] Restoring previous build..."
+rm -rf build-next
+mv build-current build-next
+mv build-prev build-current
+
+echo "[ROLLBACK] Restarting picoclaw service..."
+if command -v picoclaw &>/dev/null; then
+    picoclaw service start 2>/dev/null || true
+elif command -v picoclaw-manager &>/dev/null; then
+    picoclaw-manager service start 2>/dev/null || true
+elif systemctl --user list-unit-files | grep -q picoclaw; then
+    systemctl --user start picoclaw
+fi
+
+echo "[ROLLBACK] Done."
